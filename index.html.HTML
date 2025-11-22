@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talpa Sabor & Descanso - Interfaz Unificada</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* 1. Estilos Globales y Layout */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .app-screen {
+            width: 100%;
+            max-width: 440px; /* Simulación de móvil */
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 2. Encabezado */
+        header {
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-products { background-color: #8b0000; } /* Vino/Dulces */
+        .header-hotels { background-color: #4db6ac; }    /* Turquesa/Hoteles */
+
+        header .left-icons, header .right-icons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        header .icon {
+            font-size: 1.5em;
+            cursor: pointer;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .header-logo {
+            height: 30px; /* Tamaño del logo */
+            width: auto;
+            border-radius: 5px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        
+        .header-title-container {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+        .header-title-container span {
+            flex-shrink: 0; 
+        }
+
+        .content {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 70px;
+        }
+
+        /* Ocultar contenido de pantallas */
+        .screen-content { display: none; }
+        .screen-content.active { display: block; }
+        
+        /* 3. Estilos de Botones Principales */
+        .module-button {
+            display: block;
+            width: 100%;
+            padding: 25px 20px;
+            margin-bottom: 25px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffffff;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .module-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .products-button { background-color: #e57373; }
+        .hotels-button { background-color: #4db6ac; }
+
+        /* 4. Barra de Navegación Inferior (Global) */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-around;
+            max-width: 440px;
+            margin: 0 auto;
+            z-index: 20;
+        }
+
+        .nav-item {
+            color: #616161;
+            font-size: 0.8em;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .nav-item.active { color: #8b0000; }
+        .nav-item:hover { color: #8b0000; }
+
+        /* 5. Estilos de Listas y Tarjetas */
+        h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .romeria-card, .hotel-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .romeria-card:hover, .hotel-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .romeria-info, .hotel-info { flex-grow: 1; padding-right: 10px; }
+        .romeria-info h3 { margin: 0 0 5px 0; color: #8b0000; }
+        .hotel-info h3 { margin: 0 0 5px 0; color: #4db6ac; }
+        
+        .romeria-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px; }
+        .hotel-card img.main-img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-right: 0; margin-bottom: 10px; }
+
+        .location-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 10px;
+            flex-shrink: 0; 
+            transition: background-color 0.2s;
+        }
+        
+        .location-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .location-btn i { margin-right: 5px; font-size: 1em; }
+
+        /* Productos */
+        .product-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .product-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .product-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 10px; }
+        .product-item-details { flex-grow: 1; }
+        .product-item-details h4 { margin: 0; font-size: 1em; color: #333; }
+        .product-item-price { font-weight: bold; color: #008000; }
+
+        /* Habitaciones */
+        .room-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .room-card img { width: 100px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px; }
+        .room-details { flex-grow: 1; }
+        .room-details h4 { margin: 0 0 5px 0; color: #333; }
+        .room-price-info { text-align: right; }
+        .room-price-info .price { font-size: 1.2em; font-weight: bold; color: #008000; }
+        .reserve-btn { 
+            background-color: #4db6ac; 
+            color: white; 
+            padding: 8px 15px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin-top: 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .reserve-btn:hover {
+            background-color: #3a8a82;
+        }
+
+        .primary-btn { 
+            color: white; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 10px; 
+            width: 100%; 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .products-btn { background-color: #e57373; }
+        .hotels-btn { background-color: #4db6ac; }
+
+        /* Formularios */
+        .search-form input, .search-form select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        /* Confirmación */
+        .confirmation-box {
+            text-align: center;
+            padding: 30px 20px;
+            border: 2px solid #8b0000;
+            border-radius: 15px;
+            background-color: #fff8f8;
+        }
+        .confirmation-box i {
+            font-size: 4em;
+            color: #8b0000;
+            margin-bottom: 20px;
+        }
+
+        /* QR Code placeholder */
+        .qr-code {
+            margin: 20px auto;
+            width: 150px;
+            height: 150px;
+            background-color: #ddd;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        /* Categorías de productos */
+        .product-category {
+            margin-top: 30px;
+        }
+        
+        .product-category h3 {
+            color: #8b0000;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        
+        /* Dirección de romería */
+        .romeria-address {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Estrellas de calificación */
+        .rating {
+            color: #ffc107;
+            margin: 5px 0;
+        }
+
+        /* Nuevos estilos para funcionalidad offline */
+        .offline-guide {
+            background-color: #f8f9fa;
+            border: 2px solid #4db6ac;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .direction-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4db6ac;
+        }
+        
+        .step-number {
+            background: #4db6ac;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex-grow: 1;
+        }
+        
+        .landmark {
+            font-weight: bold;
+            color: #8b0000;
+            margin-top: 5px;
+        }
+        
+        .distance {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .offline-map {
+            width: 100%;
+            height: 200px;
+            background: #e9ecef;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #666;
+        }
+        
+        .offline-badge {
+            background: #ffc107;
+            color: #856404;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        
+        .welcome-image {
+            width: 100%;
+            height: 200px; /* Tamaño fijo para la imagen de bienvenida */
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-screen">
+        
+        <header id="app-header" class="header-products">
+            <div class="left-icons">
+                <i class="fas fa-arrow-left icon" onclick="goBack()"></i>
+            </div>
+            <div class="header-title-container">
+                <i class="fas fa-mountain header-logo" style="font-size: 1.8em;"></i> 
+                <span id="header-title">Talpa Sabor & Descanso</span>
+            </div>
+            <div class="right-icons">
+                <i class="fas fa-language icon" onclick="toggleLanguage()" title="Cambiar Idioma"></i>
+                <i class="fas fa-shopping-cart icon" onclick="showScreen('carrito')"></i>
+                <i class="fas fa-wifi-slash icon" id="offline-indicator" style="display: none;" title="Modo Sin Conexión"></i>
+            </div>
+        </header>
+
+        <div class="content">
+
+            <div id="dashboard" class="screen-content active">
+                <h1 style="color: #8b0000; font-size: 2em; text-align: center;" id="welcome-title">Bienvenido a Talpa</h1>
+                <p style="color: #666; text-align: center; margin-bottom: 40px;" id="slogan">"Tu guía completa para el sabor y el descanso en Talpa."</p>
+                <div style="text-align: center; font-style: italic; color: #4db6ac; margin-bottom: 30px;" id="current-language">Idioma: Español</div>
+                
+                <div class="welcome-image">
+                    <img id="dashboard-image" src="https://www.eventeny.com/users/pic/241673-business-logo-lnd5fb8nhbpy1662655354-600.jpg" alt="Imagen de Bienvenida de Talpa" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                    </div>
+
+                <a href="#" class="module-button products-button" onclick="showScreen('catalogo')" id="btn-products">
+                    <i class="fas fa-shopping-basket"></i> Comprar Productos Locales
+                </a>
+
+                <a href="#" class="module-button hotels-button" onclick="showScreen('busqueda-hoteles')" id="btn-hotels">
+                    <i class="fas fa-hotel"></i> Reservar Hoteles
+                </a>
+            </div>
+
+            <div id="catalogo" class="screen-content">
+                <h2 id="catalogo-title">Elige tu Romería</h2>
+                
+                <div class="romeria-card" onclick="showRomeriasProducts('el-milagro')">
+                    <img src="https://cdn.empresasenmexico.net/IMG/mx/83251_1.jpg" alt="Logo Rollería El Milagro">
+                    <div class="romeria-info">
+                        <h3>Rollería El Milagro</h3>
+                        <p id="romeria-milagro-desc">Especialidad: Rollos de guayaba tradicional y rompope.</p>
+                        <div class="romeria-address">Benito Juárez 12, Centro</div>
+                        <div class="rating">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Rolleria+El+Milagro+Benito+Juarez+12+Centro+Talpa+de+Allende+Jalisco" target="_blank" class="location-btn" id="location-el-milagro">
+                        <i class="fas fa-map-marker-alt"></i> <span class="location-text">Ubicación</span>
+                    </a>
+                </div>
+
+                <div class="romeria-card" onclick="showRomeriasProducts('los-sanchez')">
+                    <img src="https://cdn.empresasenmexico.net/IMG/mx/215579_1.jpg" alt="Logo Rollería Los Sánchez">
+                    <div class="romeria-info">
+                        <h3>Rollería Los Sánchez</h3>
+                        <p id="romeria-sanchez-desc">Especialidad: Rollos rellenos de leche quemada y tejocote.</p>
+                        <div class="romeria-address">Independencia 61, Centro</div>
+                        <div class="rating">⭐⭐⭐⭐</div>
+                    </div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Rolleria+Los+Sanchez+Independencia+61+Centro+Talpa+de+Allende+Jalisco" target="_blank" class="location-btn" id="location-los-sanchez">
+                        <i class="fas fa-map-marker-alt"></i> <span class="location-text">Ubicación</span>
+                    </a>
+                </div>
+            </div>
+
+            <div id="romeria-products-view" class="screen-content">
+                <h2 id="romeria-products-title">Productos de...</h2>
+                
+                <div class="product-category">
+                    <h3 id="category-rollos">Rollos de Guayaba</h3>
+                    <div class="product-item" onclick="showProductDetail('rollo-tradicional')">
+                        <img src="https://i.pinimg.com/originals/fd/bd/6c/fdbd6cdf926e5844ced66b9d775b53c9.jpg" alt="Rollo Tradicional">
+                        <div class="product-item-details">
+                            <h4 id="h4-rollo-tradicional">Rollo de Guayaba Tradicional</h4>
+                            <p id="p-rollo-tradicional">Fresco y auténtico sabor a guayaba.</p>
+                        </div>
+                        <span class="product-item-price" id="price-rollo-tradicional">$80 MXN</span>
+                    </div>
+                    <div class="product-item" onclick="showProductDetail('rollo-leche')">
+                        <img src="https://gourmetdemexico.com.mx/wp-content/uploads/2023/09/rollo-de-guayaba3-1024x678.jpg" alt="Rollo Leche Quemada">
+                        <div class="product-item-details">
+                            <h4 id="h4-rollo-leche">Rollo Relleno de Leche Quemada</h4>
+                            <p id="p-rollo-leche">La combinación perfecta de dulce y cremoso.</p>
+                        </div>
+                        <span class="product-item-price" id="price-rollo-leche">$95 MXN</span>
+                    </div>
+                    <div class="product-item" onclick="showProductDetail('rollo-cajeta')">
+                        <img src="https://www.cardamomo.news/__export/1691529298847/sites/debate/img/2023/08/08/rollo_de_guayaba_con_cajeta.png_673822677.png" alt="Rollo Cajeta">
+                        <div class="product-item-details">
+                            <h4 id="h4-rollo-cajeta">Rollo de Cajeta</h4>
+                            <p id="p-rollo-cajeta">Delicioso rollo relleno de cajeta artesanal.</p>
+                        </div>
+                        <span class="product-item-price" id="price-rollo-cajeta">$100 MXN</span>
+                    </div>
+                    <div class="product-item" onclick="showProductDetail('rollo-pina')">
+                        <img src="https://tse4.mm.bing.net/th/id/OIP.xvShpai5shdRwJOI70oSZwHaE5?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Rollo Piña" id="img-rollo-pina">
+                        <div class="product-item-details">
+                            <h4 id="h4-rollo-pina">Rollo de Piña</h4>
+                            <p id="p-rollo-pina">Exquisito rollo con relleno de piña caramelizada.</p>
+                        </div>
+                        <span class="product-item-price" id="price-rollo-pina">$90 MXN</span>
+                    </div>
+                </div>
+                
+                <div class="product-category">
+                    <h3 id="category-licores">Licores y Dulces</h3>
+                    <div class="product-item" onclick="showProductDetail('rompope')">
+                        <img src="https://i5.walmartimages.com.mx/gr/images/product-images/img_large/00750104370140L.jpg?odnHeight=612&odnWidth=612&odnBg=FFFFFF" alt="Rompope">
+                        <div class="product-item-details">
+                            <h4 id="h4-rompope">Rompope Artesanal (1 Litro)</h4>
+                            <p id="p-rompope">Con la receta secreta de la casa, sabor nuez.</p>
+                        </div>
+                        <span class="product-item-price" id="price-rompope">$180 MXN</span>
+                    </div>
+                    <div class="product-item" onclick="showProductDetail('cocadas')">
+                        <img src="https://tse1.mm.bing.net/th/id/OIP.apM4iq2dfYxClbboDUnQmwHaEK?pid=ImgDetMain" alt="Cocadas">
+                        <div class="product-item-details">
+                            <h4 id="h4-cocadas">Cocadas Tradicionales (Paquete)</h4>
+                            <p id="p-cocadas">Dulce de coco suave, recién horneado.</p>
+                        </div>
+                        <span class="product-item-price" id="price-cocadas">$60 MXN</span>
+                    </div>
+                    <div class="product-item" onclick="showProductDetail('ate-membrillo')">
+                        <img src="https://bing.com/th?id=OSK.c725e7ac7baedd15d821360b23a700c0" alt="Ate de Membrillo">
+                        <div class="product-item-details">
+                            <h4 id="h4-ate-membrillo">Ate de Membrillo (200g)</h4>
+                            <p id="p-ate-membrillo">Un clásico dulce de fruta, ideal para acompañar queso.</p>
+                        </div>
+                        <span class="product-item-price" id="price-ate-membrillo">$70 MXN</span>
+                    </div>
+                    <div class="product-item" onclick="showProductDetail('dulce-tejocote')">
+                        <img src="https://estag.fimagenes.com/imagenesred/2393128_0.png?1" alt="Dulce de Tejocote" id="img-dulce-tejocote">
+                        <div class="product-item-details">
+                            <h4 id="h4-dulce-tejocote">Dulce de Tejocote (200g)</h4>
+                            <p id="p-dulce-tejocote">Dulce tradicional de tejocote, sabor único.</p>
+                        </div>
+                        <span class="product-item-price" id="price-dulce-tejocote">$75 MXN</span>
+                    </div>
+                </div>
+
+                <div class="product-category">
+                    <h3 id="category-especialidades">Especialidades de la Casa</h3>
+                    <div class="product-item" onclick="showProductDetail('cajeta-artesanal')">
+                        <img src="https://mexicorutamagica.mx/wp-content/uploads/2021/02/cajeta-de-celaya.jpg" alt="Cajeta Artesanal" id="img-cajeta-artesanal">
+                        <div class="product-item-details">
+                            <h4 id="h4-cajeta-artesanal">Cajeta Artesanal (500g)</h4>
+                            <p id="p-cajeta-artesanal">Deliciosa cajeta de leche de cabra, elaborada tradicionalmente.</p>
+                        </div>
+                        <span class="product-item-price" id="price-cajeta-artesanal">$120 MXN</span>
+                    </div>
+                    <div class="product-item" onclick="showProductDetail('mermelada-guayaba')">
+                        <img src="https://tse2.mm.bing.net/th/id/OIP.rYax4MUyQoJ1uMnjP5x7wwHaE7?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Mermelada de Guayaba" id="img-mermelada-guayaba">
+                        <div class="product-item-details">
+                            <h4 id="h4-mermelada-guayaba">Mermelada de Guayaba (250g)</h4>
+                            <p id="p-mermelada-guayaba">Mermelada casera con el auténtico sabor de la guayaba.</p>
+                        </div>
+                        <span class="product-item-price" id="price-mermelada-guayaba">$65 MXN</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <a id="romeria-location-btn" href="#" target="_blank" class="location-btn" style="display: inline-flex; padding: 12px 20px; font-size: 1em;">
+                        <i class="fas fa-map-marker-alt"></i> <span class="location-text">Ver Ubicación en Mapa</span>
+                    </a>
+                </div>
+            </div>
+
+            <div id="producto-detalle" class="screen-content">
+                <img id="product-detail-img" src="https://i.pinimg.com/originals/fd/bd/6c/fdbd6cdf926e5844ced66b9d775b53c9.jpg" alt="Rollo de Guayaba" style="width: 100%; border-radius: 10px; margin-bottom: 20px;">
+                
+                <h3 id="product-detail-name" style="font-size: 1.5em; color: #8b0000; margin-top: 0;">Rollo de Guayaba Tradicional</h3>
+                <p id="product-detail-desc">Fresco y auténtico sabor a guayaba, directamente de la Romería.</p>
+
+                <div style="border: 1px solid #f0f0f0; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <label style="font-weight: bold; display: block;" id="label-size">Tamaño / Peso</label>
+                    <select id="size" onchange="updateProductPrice()">
+                        <option value="s" id="opt-size-s">Pequeño (250g) - $80 MXN</option>
+                        <option value="m" selected id="opt-size-m">Mediano (500g) - $150 MXN</option>
+                        <option value="l" id="opt-size-l">Grande (1kg) - $280 MXN</option>
+                    </select>
+                    
+                    <label style="font-weight: bold; display: block; margin-top: 15px;" id="label-quantity">Cantidad</label>
+                    <input type="number" id="quantity" value="1" min="1" style="width: 50px; display: block;" onchange="updateProductPrice()">
+                </div>
+                
+                <div class="price-display" id="product-detail-price-display">Precio Total Estimado: *$150 MXN*</div>
+                
+                <button class="primary-btn products-btn" onclick="showScreen('carrito')" id="btn-add-to-cart">
+                    <i class="fas fa-cart-plus"></i> Añadir al Carrito
+                </button>
+            </div>
+
+            <div id="carrito" class="screen-content">
+                <h2 id="carrito-title">🛒 Resumen y Pago</h2>
+
+                <div style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="margin: 0;" id="carrito-items-count">2 ítems de Rollería El Milagro</h4>
+                    <p style="font-size: 0.9em;" id="carrito-total-products">Total Productos: $480 MXN</p>
+                </div>
+                
+                <h3 style="color: #8b0000;" id="carrito-delivery-mode">Modo de Entrega</h3>
+                <div style="border: 2px solid #e57373; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                    <label><input type="radio" name="delivery" checked id="radio-pickup"> *Apartar y Recoger* (Rollería El Milagro)</label>
+                    <input type="datetime-local" value="2025-11-16T15:00" style="margin-top: 10px;">
+                </div>
+                
+                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <label id="label-delivery"><input type="radio" name="delivery"> Envío a Domicilio</label>
+                </div>
+
+                <div style="text-align: center; font-size: 1.3em; font-weight: bold;" id="carrito-final-total">
+                    Total Final: $480 MXN
+                </div>
+                
+                <button class="primary-btn products-btn" onclick="showScreen('confirmacion-compra')" id="btn-checkout">
+                    Continuar y Pagar con Tarjeta en Línea
+                </button>
+            </div>
+            
+            <div id="confirmacion-compra" class="screen-content">
+                <div class="confirmation-box">
+                    <i class="fas fa-check-circle"></i>
+                    <h2 id="confirmation-purchase-title">¡Pedido Confirmado!</h2>
+                    <p id="confirmation-purchase-msg">Tu pedido *#12345* ha sido aprobado.</p>
+                    <h3 style="color: #8b0000;" id="confirmation-purchase-code">Muestra este código al recoger:</h3>
+                    <div class="qr-code">
+                        [CÓDIGO QR]
+                    </div>
+                    <p style="font-size: 0.9em;" id="confirmation-purchase-time">*Recoger 16/Nov a las 3:00 PM* en Rollería El Milagro</p>
+                </div>
+            </div>
+
+            <div id="busqueda-hoteles" class="screen-content">
+                <h2 id="search-hotels-title">🔍 Define tu Estancia</h2>
+                <div class="search-form">
+                    <input type="date" value="2025-12-24">
+                    <input type="date" value="2025-12-26">
+                    <input type="number" placeholder="No. de Adultos" value="2" min="1" id="input-adults">
+                    <select id="select-location">
+                        <option value="santuario">Cercano al Santuario</option>
+                        <option value="centro">Centro Histórico</option>
+                        <option value="economico">Económico</option>
+                    </select>
+                </div>
+                <button class="primary-btn hotels-btn" onclick="showScreen('resultados-hoteles')" id="btn-search-hotels">
+                    Buscar Hoteles
+                </button>
+            </div>
+            
+            <div id="resultados-hoteles" class="screen-content">
+                <h2 id="results-title">⭐ Hoteles Disponibles (5 Resultados)</h2>
+
+                <div class="hotel-card" onclick="showHotelDetails('diamante')">
+                    <img class="main-img" src="https://www.hospedarme.com.mx/wp-content/uploads/2019/07/hotel-diamante-hoteles-en-talpa-de-allende.jpg" alt="Hotel Diamante">
+                    <div class="hotel-info">
+                        <h3>Hotel Diamante</h3>
+                        <div class="rating">⭐⭐⭐⭐</div>
+                        <p style="font-weight: bold;" id="diamante-price-text">Desde $750 MXN / Noche</p>
+                        <p style="font-size: 0.9em;"><i class="fas fa-wifi"></i> <i class="fas fa-parking"></i></p>
+                    </div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Diamante+Talpa+de+Allende+Jalisco" target="_blank" class="location-btn">
+                        <i class="fas fa-map-marker-alt"></i> <span class="location-text">Ubicación</span>
+                    </a>
+                </div>
+
+                <div class="hotel-card" onclick="showHotelDetails('parroquia')">
+                    <img class="main-img" src="https://tse1.explicit.bing.net/th/id/OIP.pYG6gCxMn1p6j9a9exYrWAHaDf?pid=ImgDetMain" alt="Hotel La Parroquia">
+                    <div class="hotel-info">
+                        <h3>Hotel La Parroquia</h3>
+                        <div class="rating">⭐⭐⭐</div>
+                        <p style="font-weight: bold;" id="parroquia-price-text">Desde $480 MXN / Noche (Opción Económica)</p>
+                        <p style="font-size: 0.9em;"><i class="fas fa-wifi"></i></p>
+                    </div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Hotel+La+Parroquia+Talpa+de+Allende+Jalisco" target="_blank" class="location-btn">
+                        <i class="fas fa-map-marker-alt"></i> <span class="location-text">Ubicación</span>
+                    </a>
+                </div>
+                
+                <div class="hotel-card" onclick="showHotelDetails('providencia')">
+                    <img class="main-img" src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/11/0e/fd/13/photo0jpg.jpg?w=1200&h=1200&s=1" alt="Hotel Providencia">
+                    <div class="hotel-info">
+                        <h3>Hotel Providencia</h3>
+                        <div class="rating">⭐⭐⭐⭐</div>
+                        <p style="font-weight: bold;" id="providencia-price-text">Desde $620 MXN / Noche</p>
+                        <p style="font-size: 0.9em;"><i class="fas fa-parking"></i> <i class="fas fa-tv"></i></p>
+                    </div>
+                    <a href="http://googleusercontent.com/maps.google.com/4" target="_blank" class="location-btn">
+                        <i class="fas fa-map-marker-alt"></i> <span class="location-text">Ubicación</span>
+                    </a>
+                </div>
+            </div>
+
+            <div id="hotel-detalle" class="screen-content">
+                <img id="hotel-detail-main-img" src="" alt="Hotel Detalle" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">
+                <h2 id="hotel-detail-name-title" style="color: #4db6ac; margin-top: 0;">Hotel Detalle</h2>
+                <p id="hotel-detail-desc">Ubicación céntrica, ideal para peregrinos y turistas. Se aceptan pagos con tarjeta en línea.</p>
+
+                <h3 style="color: #4db6ac; margin-top: 30px;" id="hotel-detail-rooms-title">Habitaciones Disponibles</h3>
+                <div id="room-list-container">
+                    </div>
+            </div>
+
+            <div id="reserva-huesped" class="screen-content">
+                <h2 id="guest-reserve-title">✅ Completa tu Reserva</h2>
+
+                <div style="background-color: #f0fafa; padding: 15px; border-radius: 10px; margin-bottom: 20px;" id="reserve-summary">
+                    *Hotel Diamante* | Hab. Doble Lujo<br> Check-in: 24 Dic. | Total por 2 Noches: $3,000 MXN
+                </div>
+
+                <h3 style="color: #4db6ac;" id="guest-data-title">Datos del Huésped</h3>
+                <form>
+                    <input type="text" placeholder="Nombre Completo del Huésped" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;" id="input-full-name">
+                    <input type="email" placeholder="Correo Electrónico" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;" id="input-email">
+                    <input type="tel" placeholder="Teléfono de Contacto" required style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;" id="input-phone">
+                </form>
+                
+                <h3 style="color: #4db6ac; margin-top: 30px;" id="online-payment-title"><i class="fas fa-credit-card"></i> Pago en Línea</h3>
+                <p id="advance-payment-info">Se requiere un *30% de anticipo ($900 MXN)* para confirmar la reserva en línea.</p>
+
+                <button class="primary-btn hotels-btn" onclick="showScreen('confirmacion-hotel')" id="btn-pay-advance">
+                    Pagar Anticipo con Tarjeta ($900 MXN)
+                </button>
+            </div>
+            
+            <div id="confirmacion-hotel" class="screen-content">
+                <div class="confirmation-box" style="border-color: #4db6ac; background-color: #f8ffff;">
+                    <i class="fas fa-check-circle" style="color: #4db6ac;"></i>
+                    <h2 id="confirmation-hotel-title">¡Reserva Exitosa!</h2>
+                    <p id="confirmation-hotel-msg">Tu habitación ha sido bloqueada. *Número de Confirmación: R78901*.</p>
+                    <h3 style="color: #4db6ac;" id="confirmation-hotel-details">Hotel Diamante. Habitación Doble Lujo. Check-in: 24/Dic.</h3>
+                    <p style="font-size: 0.9em;" id="confirmation-hotel-email">Revisa tu email para el comprobante de pago.</p>
+                </div>
+            </div>
+
+            <div id="guia-offline" class="screen-content">
+                <h2 id="offline-guide-title">🗺️ Guía Sin Internet</h2>
+                <p class="offline-guide" id="offline-guide-info">Estas instrucciones de ubicación funcionan sin conexión a internet.</p>
+                
+                <label for="offline-destination-select" style="font-weight: bold; display: block; margin-bottom: 10px;" id="opt-select-dest">Selecciona tu destino:</label>
+                <select id="offline-destination-select" onchange="showOfflineDirections(this.value)" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                    <option value="">Selecciona un lugar...</option>
+                    <option value="el-milagro">Rollería El Milagro</option>
+                    <option value="los-sanchez">Rollería Los Sánchez</option>
+                    <option value="santuario">Santuario de Talpa</option>
+                    <option value="plaza">Plaza Principal</option>
+                </select>
+                
+                <div id="offline-directions-container">
+                    <div class="offline-map">
+                        <i class="fas fa-map-marker-alt" style="font-size: 2em; margin-bottom: 5px;"></i>
+                        <span>Mapa y Guía de Ruta</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <nav class="nav-bar">
+            <a href="#" class="nav-item active" id="nav-dashboard" onclick="showScreen('dashboard')">
+                <i class="fas fa-home"></i>
+                <span id="nav-home-text">Inicio</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-productos" onclick="showScreen('catalogo')">
+                <i class="fas fa-shopping-basket"></i>
+                <span id="nav-products-text">Productos</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-hoteles" onclick="showScreen('busqueda-hoteles')">
+                <i class="fas fa-hotel"></i>
+                <span id="nav-hotels-text">Hoteles</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-guia" onclick="showScreen('guia-offline')">
+                <i class="fas fa-map-marked-alt"></i>
+                <span id="nav-guide-text">Guía Offline</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // --- CONSTANTES DE IMAGEN (ACTUALIZADAS) ---
+        const ROLLO_TRADICIONAL_IMG = 'https://i.pinimg.com/originals/fd/bd/6c/fdbd6cdf926e5844ced66b9d775b53c9.jpg';
+        const ROLLO_LECHE_QUEMADA_IMG = 'https://gourmetdemexico.com.mx/wp-content/uploads/2023/09/rollo-de-guayaba3-1024x678.jpg';
+        const ROLLO_CAJETA_IMG = 'https://www.cardamomo.news/__export/1691529298847/sites/debate/img/2023/08/08/rollo_de_guayaba_con_cajeta.png_673822677.png';
+        const ROLLO_PINA_IMG = 'https://tse4.mm.bing.net/th/id/OIP.xvShpai5shdRwJOI70oSZwHaE5?rs=1&pid=ImgDetMain&o=7&rm=3';
+        const MERMELADA_GUAYABA_IMG = 'https://tse2.mm.bing.net/th/id/OIP.rYax4MUyQoJ1uMnjP5x7wwHaE7?rs=1&pid=ImgDetMain&o=7&rm=3';
+        const CAJETA_ARTESANAL_IMG = 'https://mexicorutamagica.mx/wp-content/uploads/2021/02/cajeta-de-celaya.jpg'; 
+        
+        // INICIO DE CAMBIO DE IMAGENES
+        const WELCOME_IMG = 'https://www.eventeny.com/users/pic/241673-business-logo-lnd5fb8nhbpy1662655354-600.jpg'; 
+        const MEMBRILLO_TEJOCOTE_GENERIC_IMG = 'https://bing.com/th?id=OSK.c725e7ac7baedd15d821360b23a700c0';
+        // FIN DE CAMBIO DE IMAGENES
+
+        // Imágenes genéricas mantenidas
+        const ROMPOPE_IMG = 'https://i5.walmartimages.com.mx/gr/images/product-images/img_large/00750104370140L.jpg?odnHeight=612&odnWidth=612&odnBg=FFFFFF';
+        const COCADAS_IMG = 'https://tse1.mm.bing.net/th/id/OIP.apM4iq2dfYxClbboDUnQmwHaEK?pid=ImgDetMain'; 
+        
+        // --- DATOS DE LA APLICACIÓN ---
+        let currentRomeriId = 'el-milagro'; // Romería actual seleccionada (se usa para precarga y navegación)
+
+        const productData = {
+            'el-milagro': {
+                name: 'Rollería El Milagro',
+                address: 'Benito Juárez 12, Centro',
+                mapUrl: 'https://www.google.com/maps/search/?api=1&query=Rolleria+El+Milagro+Benito+Juarez+12+Centro+Talpa+de+Allende+Jalisco',
+                prices: {
+                    'rollo-tradicional': 80,
+                    'rollo-leche': 95,
+                    'rollo-cajeta': 100,
+                    'rollo-pina': 90,
+                    'rompope': 180,
+                    'cocadas': 60,
+                    'ate-membrillo': 70,
+                    'dulce-tejocote': 75,
+                    'cajeta-artesanal': 120,
+                    'mermelada-guayaba': 65
+                }
+            },
+            'los-sanchez': {
+                name: 'Rollería Los Sánchez',
+                address: 'Independencia 61, Centro',
+                mapUrl: 'https://www.google.com/maps/search/?api=1&query=Rolleria+Los+Sanchez+Independencia+61+Centro+Talpa+de+Allende+Jalisco',
+                prices: {
+                    'rollo-tradicional': 85,
+                    'rollo-leche': 90,
+                    'rollo-cajeta': 110,
+                    'rollo-pina': 85,
+                    'rompope': 170,
+                    'cocadas': 65,
+                    'ate-membrillo': 70,
+                    'dulce-tejocote': 75,
+                    'cajeta-artesanal': 130,
+                    'mermelada-guayaba': 70
+                }
+            }
+        };
+
+        const hotelData = {
+            'diamante': {
+                name: 'Hotel Diamante',
+                desc: 'Ubicación céntrica, ideal para peregrinos y turistas. Se aceptan pagos con tarjeta en línea.',
+                img: 'https://www.hospedarme.com.mx/wp-content/uploads/2019/07/hotel-diamante-hoteles-en-talpa-de-allende.jpg',
+                rooms: [
+                    // INICIO DE CAMBIOS DE IMAGENES SOLICITADOS
+                    { type: 'doble-estandar', descId: 'room-desc-doble-estandar', price: 1500, img: 'https://tse3.mm.bing.net/th/id/OIP.Gn58VmeWkjBBGHMqdxJCmAHaE8?rs=1&pid=ImgDetMain&o=7&rm=3' }, 
+                    { type: 'suite-terraza', descId: 'room-desc-suite-terraza', price: 2000, img: 'https://tse3.mm.bing.net/th/id/OIP._Sol4Z8xlLlHnOoiAPCx2gHaE7?rs=1&pid=ImgDetMain&o=7&rm=3' }
+                    // FIN DE CAMBIOS DE IMAGENES SOLICITADOS
+                ]
+            },
+            'parroquia': {
+                name: 'Hotel La Parroquia',
+                desc: 'Opción económica, a pasos del Santuario. Habitaciones sencillas y limpias.',
+                img: 'https://tse1.explicit.bing.net/th/id/OIP.pYG6gCxMn1p6j9a9exYrWAHaDf?pid=ImgDetMain',
+                rooms: [
+                    // INICIO DE CAMBIOS DE IMAGENES SOLICITADOS
+                    { type: 'individual-economica', descId: 'room-desc-individual-economica', price: 480, img: 'https://tse1.explicit.bing.net/th/id/OIP._PcJ8KEjCOq8iwqIIDe8JwHaE8?rs=1&pid=ImgDetMain&o=7&rm=3' },
+                    { type: 'doble-premium', descId: 'room-desc-doble-premium', price: 1100, img: 'https://tse2.mm.bing.net/th/id/OIP.z_ZhDCNGkwNMhj6QOTpRhwHaF9?rs=1&pid=ImgDetMain&o=7&rm=3' }
+                    // FIN DE CAMBIOS DE IMAGENES SOLICITADOS
+                ]
+            },
+            'providencia': {
+                name: 'Hotel Providencia',
+                desc: 'Hotel moderno con excelente servicio y estacionamiento privado.',
+                img: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/11/0e/fd/13/photo0jpg.jpg?w=1200&h=1200&s=1',
+                rooms: [
+                    // INICIO DE CAMBIOS DE IMAGENES SOLICITADOS
+                    { type: 'doble-premium', descId: 'room-desc-doble-premium', price: 1240, img: 'https://tse2.mm.bing.net/th/id/OIP.gWIbjC6nTW2FsZ69H0YlOgHaFL?rs=1&pid=ImgDetMain&o=7&rm=3' },
+                    { type: 'familiar-grande', descId: 'room-desc-familiar-grande', price: 1800, img: 'https://tse1.mm.bing.net/th/id/OIP.3pNe7Achyzpk0D2fYmhUGAHaE8?rs=1&pid=ImgDetMain&o=7&rm=3' }
+                    // FIN DE CAMBIOS DE IMAGENES SOLICITADOS
+                ]
+            }
+        };
+
+        const guiasDestinos = {
+            'el-milagro': {
+                nombre: 'Rollería El Milagro',
+                direccion: 'Benito Juárez 12, Centro',
+                desdePlaza: [
+                    { paso: 'Desde la Plaza Principal, toma la Calle Morelos hacia el norte.', distancia: '50 metros' },
+                    { paso: 'Gira a la izquierda en Calle Benito Juárez, después de la Farmacia.', distancia: '100 metros' },
+                    { paso: 'La Rollería El Milagro estará a tu izquierda.', distancia: '20 metros', referencia: 'Fachada con arcos de color rojo y blanco.' }
+                ],
+                desdeSantuario: [
+                    { paso: 'Desde el Santuario, toma la Calle Independencia hacia el oeste.', distancia: '100 metros' },
+                    { paso: 'Gira a la derecha en Calle Hidalgo', distancia: '70 metros' },
+                    { paso: 'Gira a la izquierda en Calle Benito Juárez', distancia: '30 metros' },
+                    { paso: 'Destino a tu derecha', distancia: '20 metros' }
+                ],
+                referencias: ['Farmacia Guadalajara', 'Tienda de abarrotes "La Económica"', 'Color amarillo en fachada']
+            },
+            'los-sanchez': {
+                nombre: 'Rollería Los Sánchez',
+                direccion: 'Independencia 61, Centro',
+                desdePlaza: [
+                    { paso: 'Desde la Plaza Principal, camina hacia el este por Calle Independencia', distancia: '80 metros' },
+                    { paso: 'La Rollería Los Sánchez estará a tu izquierda', distancia: '60 metros', referencia: 'Esquina con Calle Morelos' }
+                ],
+                desdeSantuario: [
+                    { paso: 'Desde el Santuario, camina directo por Calle Independencia', distancia: '150 metros' },
+                    { paso: 'Destino a tu izquierda después del mercado', distancia: '50 metros' }
+                ],
+                referencias: ['Esquina con Calle Morelos', 'Frente a la panadería', 'Letrero rojo grande']
+            },
+            'santuario': {
+                nombre: 'Santuario de Talpa',
+                direccion: 'Plaza Principal S/N',
+                desdePlaza: [
+                    { paso: 'Estás en la Plaza Principal', distancia: '0 metros' },
+                    { paso: 'El Santuario se encuentra en el lado este de la plaza', distancia: '30 metros' }
+                ],
+                referencias: ['Edificio blanco con campanarios', 'Plaza principal', 'Árboles grandes alrededor']
+            },
+            'plaza': {
+                nombre: 'Plaza Principal',
+                direccion: 'Centro de Talpa',
+                referencias: ['Kiosko central', 'Rodeada de edificios históricos', 'Frente al Santuario']
+            }
+        };
+
+        const screens = {
+            'dashboard': { title_es: 'Talpa Sabor & Descanso', title_en: 'Talpa Flavor & Rest', headerClass: 'header-products' },
+            'catalogo': { title_es: 'Comprar Productos', title_en: 'Buy Products', headerClass: 'header-products' },
+            'romeria-products-view': { title_es: 'Productos de Romería', title_en: 'Romería Products', headerClass: 'header-products' },
+            'producto-detalle': { title_es: 'Personalizar Pedido', title_en: 'Customize Order', headerClass: 'header-products' },
+            'carrito': { title_es: 'Checkout y Pago', title_en: 'Checkout and Payment', headerClass: 'header-products' },
+            'confirmacion-compra': { title_es: 'Compra Finalizada', title_en: 'Purchase Finished', headerClass: 'header-products' },
+            'busqueda-hoteles': { title_es: 'Reservar Hoteles', title_en: 'Book Hotels', headerClass: 'header-hotels' },
+            'resultados-hoteles': { title_es: 'Hoteles Disponibles', title_en: 'Available Hotels', headerClass: 'header-hotels' },
+            'hotel-detalle': { title_es: 'Detalles del Hotel', title_en: 'Hotel Details', headerClass: 'header-hotels' },
+            'reserva-huesped': { title_es: 'Datos de Reserva', title_en: 'Reservation Data', headerClass: 'header-hotels' },
+            'confirmacion-hotel': { title_es: 'Reserva Finalizada', title_en: 'Reservation Finished', headerClass: 'header-hotels' },
+            'guia-offline': { title_es: 'Guía Sin Internet', title_en: 'Offline Guide', headerClass: 'header-products' }
+        };
+
+        const translationData = {
+            'es': {
+                'welcome-title': 'Bienvenido a Talpa',
+                'slogan': '"Tu guía completa para el sabor y el descanso en Talpa."',
+                'current-language': 'Idioma: Español',
+                'nav-home-text': 'Inicio',
+                'nav-products-text': 'Productos',
+                'nav-hotels-text': 'Hoteles',
+                'nav-guide-text': 'Guía Offline',
+                'btn-products': 'Comprar Productos Locales',
+                'btn-hotels': 'Reservar Hoteles',
+                'catalogo-title': 'Elige tu Romería',
+                'romeria-milagro-desc': 'Especialidad: Rollos de guayaba tradicional y rompope.',
+                'romeria-sanchez-desc': 'Especialidad: Rollos rellenos de leche quemada y tejocote.',
+                'category-rollos': 'Rollos de Guayaba',
+                'category-licores': 'Licores y Dulces',
+                'category-especialidades': 'Especialidades de la Casa',
+                'h4-rollo-tradicional': 'Rollo de Guayaba Tradicional',
+                'p-rollo-tradicional': 'Fresco y auténtico sabor a guayaba.',
+                'h4-rollo-leche': 'Rollo Relleno de Leche Quemada',
+                'p-rollo-leche': 'La combinación perfecta de dulce y cremoso.',
+                'h4-rollo-cajeta': 'Rollo de Cajeta',
+                'p-rollo-cajeta': 'Delicioso rollo relleno de cajeta artesanal.',
+                'h4-rollo-pina': 'Rollo de Piña',
+                'p-rollo-pina': 'Exquisito rollo con relleno de piña caramelizada.',
+                'h4-rompope': 'Rompope Artesanal (1 Litro)',
+                'p-rompope': 'Con la receta secreta de la casa, sabor nuez.',
+                'h4-cocadas': 'Cocadas Tradicionales (Paquete)',
+                'p-cocadas': 'Dulce de coco suave, recién horneado.',
+                'h4-ate-membrillo': 'Ate de Membrillo (200g)',
+                'p-ate-membrillo': 'Un clásico dulce de fruta, ideal para acompañar queso.',
+                'h4-dulce-tejocote': 'Dulce de Tejocote (200g)',
+                'p-dulce-tejocote': 'Dulce tradicional de tejocote, sabor único.',
+                'h4-cajeta-artesanal': 'Cajeta Artesanal (500g)',
+                'p-cajeta-artesanal': 'Deliciosa cajeta de leche de cabra, elaborada tradicionalmente.',
+                'h4-mermelada-guayaba': 'Mermelada de Guayaba (250g)',
+                'p-mermelada-guayaba': 'Mermelada casera con el auténtico sabor de la guayaba.',
+                'label-size': 'Tamaño / Peso',
+                'opt-size-s': 'Pequeño',
+                'opt-size-m': 'Mediano',
+                'opt-size-l': 'Grande',
+                'label-quantity': 'Cantidad',
+                'btn-add-to-cart': 'Añadir al Carrito',
+                'carrito-title': '🛒 Resumen y Pago',
+                'carrito-delivery-mode': 'Modo de Entrega',
+                'radio-pickup': '*Apartar y Recoger*',
+                'label-delivery': 'Envío a Domicilio',
+                'carrito-final-total': 'Total Final:',
+                'btn-checkout': 'Continuar y Pagar con Tarjeta en Línea',
+                'confirmation-purchase-title': '¡Pedido Confirmado!',
+                'confirmation-purchase-msg': 'Tu pedido *#12345* ha sido aprobado.',
+                'confirmation-purchase-code': 'Muestra este código al recoger:',
+                'confirmation-purchase-time': '*Recoger 16/Nov a las 3:00 PM* en Rollería El Milagro',
+                'search-hotels-title': '🔍 Define tu Estancia',
+                'input-adults': 'No. de Adultos',
+                'select-location-santuario': 'Cercano al Santuario',
+                'select-location-centro': 'Centro Histórico',
+                'select-location-economico': 'Económico',
+                'btn-search-hotels': 'Buscar Hoteles',
+                'results-title': '⭐ Hoteles Disponibles (5 Resultados)',
+                'hotel-price-suffix': '/ Noche',
+                'hotel-price-economica': 'Opción Económica',
+                'hotel-detail-desc': 'Ubicación céntrica, ideal para peregrinos y turistas. Se aceptan pagos con tarjeta en línea.',
+                'hotel-detail-rooms-title': 'Habitaciones Disponibles',
+                'room-per-night': 'por noche',
+                'room-reserve-btn': 'Reservar',
+                'guest-reserve-title': '✅ Completa tu Reserva',
+                'guest-data-title': 'Datos del Huésped',
+                'input-full-name': 'Nombre Completo del Huésped',
+                'input-email': 'Correo Electrónico',
+                'input-phone': 'Teléfono de Contacto',
+                'online-payment-title': 'Pago en Línea',
+                'advance-payment-info': 'Se requiere un *30% de anticipo ($900 MXN)* para confirmar la reserva en línea.',
+                'btn-pay-advance': 'Pagar Anticipo con Tarjeta ($900 MXN)',
+                'confirmation-hotel-title': '¡Reserva Exitosa!',
+                'confirmation-hotel-msg': 'Tu habitación ha sido bloqueada. *Número de Confirmación: R78901*.',
+                'confirmation-hotel-details': '*Hotel Diamante*. Habitación Doble Lujo. Check-in: 24/Dic.',
+                'confirmation-hotel-email': 'Revisa tu email para el comprobante de pago.',
+                'offline-guide-title': '🗺️ Guía Sin Internet',
+                'offline-guide-info': 'Estas instrucciones funcionan sin conexión a internet.',
+                'opt-select-dest': 'Selecciona tu destino',
+                'romeria-location-text': 'Ver Ubicación en Mapa',
+                'room-type-sencilla-economica': 'Habitación Sencilla Económica',
+                'room-desc-sencilla-economica': '1 cama matrimonial. 2 personas.',
+                'room-type-doble-premium': 'Habitación Doble Premium',
+                'room-desc-doble-premium': '2 camas matrimoniales. Capacidad 4 personas.',
+                'room-type-individual-economica': 'Habitación Individual Económica',
+                'room-desc-individual-economica': '1 cama individual. Ideal para peregrinos.',
+                'room-type-familiar-grande': 'Habitación Familiar Grande',
+                'room-desc-familiar-grande': '2 camas matrimoniales y 1 individual. Capacidad 5 personas.',
+                'room-type-doble-estandar': 'Doble Estándar',
+                'room-desc-doble-estandar': '2 camas dobles. Vista interior.',
+                'room-type-pequena': 'Habitación Pequeña',
+                'room-desc-pequena': '1 cama individual.',
+                'room-type-suite-terraza': 'Suite con Terraza',
+                'room-desc-suite-terraza': '1 cama King size y terraza privada.',
+                'room-type-doble-ejecutiva': 'Doble Ejecutiva',
+                'room-desc-doble-ejecutiva': '2 camas matrimoniales',
+                'location-text': 'Ubicación',
+                'from-plaza-text': 'Desde la Plaza Principal:',
+                'from-santuario-text': 'Desde el Santuario:',
+                'ref-text': 'Referencia',
+                'identification-ref-text': 'Referencias para identificar:',
+                'unique-size-text': 'Talla Única'
+            },
+            'en': {
+                'welcome-title': 'Welcome to Talpa',
+                'slogan': '"Your complete guide for flavor and rest in Talpa."',
+                'current-language': 'Language: English',
+                'nav-home-text': 'Home',
+                'nav-products-text': 'Products',
+                'nav-hotels-text': 'Hotels',
+                'nav-guide-text': 'Offline Guide',
+                'btn-products': 'Shop Local Products',
+                'btn-hotels': 'Book Hotels',
+                'catalogo-title': 'Choose your Romería',
+                'romeria-milagro-desc': 'Specialty: Traditional guava rolls and rompope.',
+                'romeria-sanchez-desc': 'Specialty: Rolls filled with burnt milk and tejocote.',
+                'category-rollos': 'Guava Rolls',
+                'category-licores': 'Liquors and Sweets',
+                'category-especialidades': 'House Specialties',
+                'h4-rollo-tradicional': 'Traditional Guava Roll',
+                'p-rollo-tradicional': 'Fresh and authentic guava flavor.',
+                'h4-rollo-leche': 'Burnt Milk Filled Roll',
+                'p-rollo-leche': 'The perfect combination of sweet and creamy.',
+                'h4-rollo-cajeta': 'Cajeta Roll',
+                'p-rollo-cajeta': 'Delicious roll filled with artisan cajeta.',
+                'h4-rollo-pina': 'Pineapple Roll',
+                'p-rollo-pina': 'Exquisite roll with caramelized pineapple filling.',
+                'h4-rompope': 'Artisan Rompope (1 Liter)',
+                'p-rompope': 'With the secret house recipe, pecan flavor.',
+                'h4-cocadas': 'Traditional Cocadas (Pack)',
+                'p-cocadas': 'Soft coconut candy, freshly baked.',
+                'h4-ate-membrillo': 'Quince Paste (200g)',
+                'p-ate-membrillo': 'A classic fruit paste, ideal with cheese.',
+                'h4-dulce-tejocote': 'Tejocote Sweet (200g)',
+                'p-dulce-tejocote': 'Traditional tejocote sweet, unique flavor.',
+                'h4-cajeta-artesanal': 'Artisan Cajeta (500g)',
+                'p-cajeta-artesanal': 'Delicious goat milk cajeta, traditionally made.',
+                'h4-mermelada-guayaba': 'Guava Jam (250g)',
+                'p-mermelada-guayaba': 'Homemade jam with the authentic taste of guava.',
+                'label-size': 'Size / Weight',
+                'opt-size-s': 'Small',
+                'opt-size-m': 'Medium',
+                'opt-size-l': 'Large',
+                'label-quantity': 'Quantity',
+                'btn-add-to-cart': 'Add to Cart',
+                'carrito-title': '🛒 Summary and Payment',
+                'carrito-delivery-mode': 'Delivery Mode',
+                'radio-pickup': '*Separate and Pick Up*',
+                'label-delivery': 'Home Delivery',
+                'carrito-final-total': 'Final Total:',
+                'btn-checkout': 'Continue and Pay with Card Online',
+                'confirmation-purchase-title': 'Order Confirmed!',
+                'confirmation-purchase-msg': 'Your order *#12345* has been approved.',
+                'confirmation-purchase-code': 'Show this code upon pickup:',
+                'confirmation-purchase-time': '*Pick up 16/Nov at 3:00 PM* at Rollería El Milagro',
+                'search-hotels-title': '🔍 Define your Stay',
+                'input-adults': 'No. of Adults',
+                'select-location-santuario': 'Near the Sanctuary',
+                'select-location-centro': 'Historic Center',
+                'select-location-economico': 'Budget',
+                'btn-search-hotels': 'Search Hotels',
+                'results-title': '⭐ Available Hotels (5 Results)',
+                'hotel-price-suffix': '/ Night',
+                'hotel-price-economica': 'Budget Option',
+                'hotel-detail-desc': 'Central location, ideal for pilgrims and tourists. Online card payments accepted.',
+                'hotel-detail-rooms-title': 'Available Rooms',
+                'room-per-night': 'per night',
+                'room-reserve-btn': 'Book',
+                'guest-reserve-title': '✅ Complete your Reservation',
+                'guest-data-title': 'Guest Information',
+                'input-full-name': 'Guest Full Name',
+                'input-email': 'Email Address',
+                'input-phone': 'Contact Phone',
+                'online-payment-title': 'Online Payment',
+                'advance-payment-info': 'A *30% advance payment ($900 MXN)* is required to confirm the reservation online.',
+                'btn-pay-advance': 'Pay Advance with Card ($900 MXN)',
+                'confirmation-hotel-title': 'Reservation Successful!',
+                'confirmation-hotel-msg': 'Your room has been blocked. *Confirmation Number: R78901*.',
+                'confirmation-hotel-details': '*Hotel Diamante*. Deluxe Double Room. Check-in: 24/Dec.',
+                'confirmation-hotel-email': 'Check your email for payment receipt.',
+                'offline-guide-title': '🗺️ Offline Guide',
+                'offline-guide-info': 'These location instructions work without an internet connection.',
+                'opt-select-dest': 'Select your destination',
+                'romeria-location-text': 'View Location on Map',
+                'room-type-sencilla-economica': 'Simple Economy Room',
+                'room-desc-sencilla-economica': '1 double bed. 2 people.',
+                'room-type-doble-premium': 'Premium Double Room',
+                'room-desc-doble-premium': '2 double beds. Capacity 4 people.',
+                'room-type-individual-economica': 'Individual Economy Room',
+                'room-desc-individual-economica': '1 single bed. Ideal for pilgrims.',
+                'room-type-familiar-grande': 'Large Family Room',
+                'room-desc-familiar-grande': '2 double beds and 1 single. Capacity 5 people.',
+                'room-type-doble-estandar': 'Standard Double',
+                'room-desc-doble-estandar': '2 double beds. Interior view.',
+                'room-type-pequena': 'Small Room',
+                'room-desc-pequena': '1 single bed.',
+                'room-type-suite-terraza': 'Suite with Terrace',
+                'room-desc-suite-terraza': '1 King size bed and private terrace.',
+                'room-type-doble-ejecutiva': 'Executive Double',
+                'room-desc-doble-ejecutiva': '2 double beds',
+                'location-text': 'Location',
+                'from-plaza-text': 'From the Main Plaza:',
+                'from-santuario-text': 'From the Sanctuary:',
+                'ref-text': 'Reference',
+                'identification-ref-text': 'Identification References:',
+                'unique-size-text': 'Unique Size'
+            }
+        };
+
+        let historyStack = ['dashboard'];
+        let currentLang = 'es';
+
+
+        // --- SERVICE WORKER PARA FUNCIONALIDAD OFFLINE ---
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('Service Worker registrado'))
+                .catch(() => console.log('Service Worker no compatible'));
+        }
+
+        // --- DETECCIÓN DE CONEXIÓN ---
+        function updateOnlineStatus() {
+            const indicator = document.getElementById('offline-indicator');
+            if (!navigator.onLine) {
+                indicator.style.display = 'block';
+
+                // Cambiar enlaces de mapas a la guía offline
+                document.querySelectorAll('.location-btn').forEach(btn => {
+                    const originalHref = btn.href;
+                    btn.onclick = function(e) {
+                        if (!navigator.onLine) {
+                            e.preventDefault();
+                            // Redirigir a la guía offline
+                            if (btn.closest('.romeria-card')) {
+                                const romeriaId = btn.closest('.romeria-card').onclick.toString().includes('el-milagro') ? 'el-milagro' : 'los-sanchez';
+                                showOfflineDirections(romeriaId);
+                                showScreen('guia-offline');
+                                document.getElementById('offline-destination-select').value = romeriaId;
+                            } else if (btn.closest('.hotel-card')) {
+                                // Para hoteles, no hay guías offline predefinidas en este ejemplo
+                                alert('Guía offline para hoteles no disponible.');
+                            } else if (btn.id === 'romeria-location-btn') {
+                                // Para el botón en la vista de productos, usar el ID de la romería actual
+                                showOfflineDirections(currentRomeriId);
+                                showScreen('guia-offline');
+                                document.getElementById('offline-destination-select').value = currentRomeriId;
+                            }
+                        }
+                    };
+                    btn.href = '#'; // Quitar el href original si está offline para forzar el onclick
+                    btn.querySelector('.location-text').textContent = translationData[currentLang]['nav-guide-text'];
+                });
+
+            } else {
+                indicator.style.display = 'none';
+                // Restaurar funcionalidad de mapas
+                document.getElementById('location-el-milagro').href = productData['el-milagro'].mapUrl;
+                document.getElementById('location-los-sanchez').href = productData['los-sanchez'].mapUrl;
+                document.getElementById('location-el-milagro').querySelector('.location-text').textContent = translationData[currentLang]['location-text'];
+                document.getElementById('location-los-sanchez').querySelector('.location-text').textContent = translationData[currentLang]['location-text'];
+
+                // Si estamos en la vista de productos, restaurar su botón de ubicación
+                if (historyStack[historyStack.length - 1] === 'romeria-products-view') {
+                    showRomeriasProducts(currentRomeriId); // Recargar para restaurar el botón
+                }
+
+                // Restaurar el onclick de los botones de romería (que tienen el mapa original en el HTML)
+                document.querySelectorAll('.location-btn').forEach(btn => {
+                    btn.onclick = null; // Quitar la función de redirección offline
+                    btn.href = btn.id === 'location-el-milagro' ? productData['el-milagro'].mapUrl :
+                               btn.id === 'location-los-sanchez' ? productData['los-sanchez'].mapUrl :
+                               '#';
+                });
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            translateUI(currentLang);
+            updateOnlineStatus(); // Para actualizar el texto del botón de ubicación
+        }
+
+        // --- Funciones Módulo Productos ---
+        function goBack() {
+            if (historyStack.length > 1) {
+                historyStack.pop(); // Elimina la pantalla actual del stack
+                const prevScreenId = historyStack[historyStack.length - 1]; // Oculta todas las pantallas
+                document.querySelectorAll('.screen-content').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                // Muestra la pantalla anterior
+                document.getElementById(prevScreenId).classList.add('active');
+
+                // Actualiza la cabecera y navegación
+                const info = screens[prevScreenId] || screens['dashboard'];
+                document.getElementById('header-title').textContent = info[`title_${currentLang}`];
+                const header = document.getElementById('app-header');
+                header.classList.remove('header-products', 'header-hotels');
+                header.classList.add(info.headerClass);
+
+                // Recalcula el estado activo de la nav-bar
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                if (prevScreenId.includes('hotel') || prevScreenId.includes('reserva') || prevScreenId.includes('resultados') || prevScreenId.includes('busqueda')) {
+                    document.getElementById('nav-hoteles').classList.add('active');
+                } else if (prevScreenId.includes('producto') || prevScreenId.includes('catalogo') || prevScreenId.includes('carrito') || prevScreenId.includes('romeria')) {
+                    document.getElementById('nav-productos').classList.add('active');
+                } else if (prevScreenId.includes('guia')) {
+                    document.getElementById('nav-guia').classList.add('active');
+                } else {
+                    document.getElementById('nav-dashboard').classList.add('active');
+                }
+            }
+        }
+
+        function showScreen(screenId) {
+            // Asegura que no se duplique el estado en el historial si es la misma pantalla
+            if (historyStack[historyStack.length - 1] !== screenId) {
+                historyStack.push(screenId);
+            }
+
+            // Oculta todas las pantallas
+            document.querySelectorAll('.screen-content').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Muestra la pantalla solicitada
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            } else {
+                console.error(`Error: Pantalla con ID '${screenId}' no encontrada.`);
+                return;
+            }
+
+            // Actualiza la cabecera
+            const header = document.getElementById('app-header');
+            const info = screens[screenId] || screens['dashboard'];
+            document.getElementById('header-title').textContent = info[`title_${currentLang}`];
+            header.classList.remove('header-products', 'header-hotels');
+            header.classList.add(info.headerClass);
+
+            // Actualiza la navegación
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (screenId.includes('hotel') || screenId.includes('reserva') || screenId.includes('resultados') || screenId.includes('busqueda')) {
+                document.getElementById('nav-hoteles').classList.add('active');
+            } else if (screenId.includes('producto') || screenId.includes('catalogo') || screenId.includes('carrito') || screenId.includes('romeria')) {
+                document.getElementById('nav-productos').classList.add('active');
+            } else if (screenId.includes('guia')) {
+                document.getElementById('nav-guia').classList.add('active');
+            } else {
+                document.getElementById('nav-dashboard').classList.add('active');
+            }
+        }
+
+        function showRomeriasProducts(romeriId) {
+            currentRomeriId = romeriId;
+            const data = productData[romeriId];
+            const lang = currentLang;
+
+            // 1. Actualizar título
+            document.getElementById('romeria-products-title').textContent = `${translationData[lang].romeriaProductsTitle || 'Productos de'} ${data.name}`;
+
+            // 2. Actualizar precios y productos
+            try {
+                // Actualizar los precios mostrados en la lista de productos
+                document.getElementById('price-rollo-tradicional').textContent = `$${data.prices['rollo-tradicional']} MXN`;
+                document.getElementById('price-rollo-leche').textContent = `$${data.prices['rollo-leche']} MXN`;
+                document.getElementById('price-rollo-cajeta').textContent = `$${data.prices['rollo-cajeta']} MXN`;
+                document.getElementById('price-rollo-pina').textContent = `$${data.prices['rollo-pina']} MXN`;
+                document.getElementById('price-rompope').textContent = `$${data.prices['rompope']} MXN`;
+                document.getElementById('price-cocadas').textContent = `$${data.prices['cocadas']} MXN`;
+                document.getElementById('price-ate-membrillo').textContent = `$${data.prices['ate-membrillo']} MXN`;
+                document.getElementById('price-dulce-tejocote').textContent = `$${data.prices['dulce-tejocote']} MXN`;
+                document.getElementById('price-cajeta-artesanal').textContent = `$${data.prices['cajeta-artesanal']} MXN`;
+                document.getElementById('price-mermelada-guayaba').textContent = `$${data.prices['mermelada-guayaba']} MXN`;
+            } catch (e) {
+                console.error("Error al actualizar precios:", e);
+            }
+
+            // 3. Actualizar el botón de ubicación en la vista de productos
+            const locationBtn = document.getElementById('romeria-location-btn');
+            if (locationBtn) {
+                locationBtn.href = data.mapUrl;
+                locationBtn.querySelector('.location-text').textContent = translationData[lang]['romeria-location-text'];
+            }
+            
+            showScreen('romeria-products-view');
+        }
+
+        function showProductDetail(productId) {
+            const data = productData[currentRomeriId].prices;
+            const lang = currentLang;
+            let priceBase = data['rollo-tradicional'];
+            let productDetails = {};
+
+            // Definición de detalles basada en el ID del producto
+            if (productId === 'rollo-tradicional') {
+                productDetails.name = translationData[lang]['h4-rollo-tradicional'];
+                productDetails.desc = translationData[lang]['p-rollo-tradicional'];
+                productDetails.img = ROLLO_TRADICIONAL_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'rollo-leche') {
+                productDetails.name = translationData[lang]['h4-rollo-leche'];
+                productDetails.desc = translationData[lang]['p-rollo-leche'];
+                productDetails.img = ROLLO_LECHE_QUEMADA_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'rollo-cajeta') {
+                productDetails.name = translationData[lang]['h4-rollo-cajeta'];
+                productDetails.desc = translationData[lang]['p-rollo-cajeta'];
+                productDetails.img = ROLLO_CAJETA_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'rollo-pina') {
+                productDetails.name = translationData[lang]['h4-rollo-pina'];
+                productDetails.desc = translationData[lang]['p-rollo-pina'];
+                productDetails.img = ROLLO_PINA_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'rompope') {
+                productDetails.name = translationData[lang]['h4-rompope'];
+                productDetails.desc = translationData[lang]['p-rompope'];
+                productDetails.img = ROMPOPE_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'cocadas') {
+                productDetails.name = translationData[lang]['h4-cocadas'];
+                productDetails.desc = translationData[lang]['p-cocadas'];
+                productDetails.img = COCADAS_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'ate-membrillo') {
+                productDetails.name = translationData[lang]['h4-ate-membrillo'];
+                productDetails.desc = translationData[lang]['p-ate-membrillo'];
+                productDetails.img = MEMBRILLO_TEJOCOTE_GENERIC_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'dulce-tejocote') {
+                productDetails.name = translationData[lang]['h4-dulce-tejocote'];
+                productDetails.desc = translationData[lang]['p-dulce-tejocote'];
+                productDetails.img = MEMBRILLO_TEJOCOTE_GENERIC_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'cajeta-artesanal') {
+                productDetails.name = translationData[lang]['h4-cajeta-artesanal'];
+                productDetails.desc = translationData[lang]['p-cajeta-artesanal'];
+                productDetails.img = CAJETA_ARTESANAL_IMG;
+                priceBase = data[productId];
+            } else if (productId === 'mermelada-guayaba') {
+                productDetails.name = translationData[lang]['h4-mermelada-guayaba'];
+                productDetails.desc = translationData[lang]['p-mermelada-guayaba'];
+                productDetails.img = MERMELADA_GUAYABA_IMG;
+                priceBase = data[productId];
+            } else {
+                console.error(`Producto con ID '${productId}' no encontrado.`);
+                return;
+            }
+
+            // Actualizar elementos del detalle
+            document.getElementById('product-detail-img').src = productDetails.img;
+            document.getElementById('product-detail-name').textContent = productDetails.name;
+            document.getElementById('product-detail-desc').textContent = productDetails.desc;
+
+            // Actualizar opciones de tamaño/peso
+            const sizeSelect = document.getElementById('size');
+            sizeSelect.innerHTML = '';
+            
+            // Asumiendo que solo los rollos tienen diferentes tamaños (por la lógica de precios +50/+100)
+            if (productId.includes('rollo')) {
+                sizeSelect.innerHTML = `
+                    <option value="s">${lang === 'es' ? 'Pequeño' : 'Small'} (250g) - $${priceBase} MXN</option>
+                    <option value="m" selected>${lang === 'es' ? 'Mediano' : 'Medium'} (500g) - $${priceBase + 50} MXN</option>
+                    <option value="l">${lang === 'es' ? 'Grande' : 'Large'} (1kg) - $${priceBase + 100} MXN</option>
+                `;
+            } else {
+                sizeSelect.innerHTML = `<option value="m">${lang === 'es' ? 'Talla Única' : 'Unique Size'} - $${priceBase} MXN</option>`;
+            }
+
+            // Forzar cantidad a 1 al cargar el producto
+            document.getElementById('quantity').value = 1;
+            updateProductPrice();
+            showScreen('producto-detalle');
+        }
+
+        function updateProductPrice() {
+            // Función para recalcular el precio total
+            const sizeSelect = document.getElementById('size');
+            if (sizeSelect.options.length === 0) return;
+
+            const basePriceText = sizeSelect.options[sizeSelect.selectedIndex].textContent;
+            const match = basePriceText.match(/\$(\d+)/);
+            let basePrice = match ? parseInt(match[1]) : 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const total = basePrice * quantity;
+
+            document.getElementById('product-detail-price-display').innerHTML = 
+                `${translationData[currentLang]['product-detail-price-display'] || 'Precio Total Estimado'}: *\$${total.toLocaleString('es-MX')} MXN*`;
+        }
+
+        // --- Funciones Módulo Hoteles ---
+        function showHotelDetails(hotelId) {
+            const data = hotelData[hotelId];
+            const lang = currentLang;
+
+            document.getElementById('hotel-detail-main-img').src = data.img;
+            document.getElementById('hotel-detail-name-title').textContent = data.name;
+            document.getElementById('hotel-detail-desc').textContent = translationData[lang]['hotel-detail-desc']; // Descripción genérica para este ejemplo
+
+            const roomContainer = document.getElementById('room-list-container');
+            roomContainer.innerHTML = '';
+
+            data.rooms.forEach(room => {
+                const roomCard = document.createElement('div');
+                roomCard.className = 'room-card';
+
+                // Buscar traducción del tipo y descripción
+                const translatedType = translationData[lang][`room-type-${room.type}`] || room.type;
+                const translatedDesc = translationData[lang][room.descId] || '';
+                
+                // Generar HTML de la tarjeta de habitación
+                roomCard.innerHTML = `
+                    <img src="${room.img}" alt="${translatedType}">
+                    <div class="room-details">
+                        <h4>${translatedType}</h4>
+                        <p>${translatedDesc}</p>
+                    </div>
+                    <div class="room-price-info">
+                        <span class="price">$${room.price.toLocaleString('es-MX')} MXN</span>
+                        <p class="per-night">${translationData[lang]['room-per-night']}</p>
+                        <button class="reserve-btn" onclick="showScreen('reserva-huesped')">${translationData[lang]['room-reserve-btn']}</button>
+                    </div>
+                `;
+                roomContainer.appendChild(roomCard);
+            });
+
+            showScreen('hotel-detalle');
+        }
+
+        // --- Funciones Módulo Guía Offline ---
+        function showOfflineDirections(destinoId) {
+            const destino = guiasDestinos[destinoId];
+            const contenido = document.getElementById('offline-directions-container');
+            const lang = currentLang;
+
+            if (!destino) {
+                contenido.innerHTML = `
+                    <div class="offline-map">
+                        <i class="fas fa-map-marker-alt" style="font-size: 2em; margin-bottom: 5px;"></i>
+                        <span>${translationData[lang]['offline-guide-info']}</span>
+                    </div>`;
+                return;
+            }
+
+            let html = `
+                <h3>${destino.nombre}</h3>
+                <p style="color: #666; font-style: italic;">${destino.direccion}</p>
+                <div class="offline-guide">
+                    <h4>${translationData[lang]['offline-guide-info']} <span class="offline-badge">Offline</span></h4>
+            `;
+
+            // Agregar rutas desde puntos principales
+            if (destino.desdePlaza) {
+                html += `<h4>${lang === 'es' ? 'Desde la Plaza Principal:' : 'From the Main Plaza:'}</h4>`;
+                destino.desdePlaza.forEach((paso, index) => {
+                    html += `
+                        <div class="direction-step">
+                            <div class="step-number">${index + 1}</div>
+                            <div class="step-content">
+                                <div>${paso.paso}</div>
+                                ${paso.referencia ? `<div class="landmark">${lang === 'es' ? 'Referencia' : 'Reference'}: ${paso.referencia}</div>` : ''}
+                                <div class="distance">${paso.distancia}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            if (destino.desdeSantuario) {
+                html += `<h4>${lang === 'es' ? 'Desde el Santuario:' : 'From the Sanctuary:'}</h4>`;
+                destino.desdeSantuario.forEach((paso, index) => {
+                    html += `
+                        <div class="direction-step">
+                            <div class="step-number">${index + 1}</div>
+                            <div class="step-content">
+                                <div>${paso.paso}</div>
+                                ${paso.referencia ? `<div class="landmark">${lang === 'es' ? 'Referencia' : 'Reference'}: ${paso.referencia}</div>` : ''}
+                                <div class="distance">${paso.distancia}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Agregar referencias visuales
+            if (destino.referencias) {
+                html += `<h4>${lang === 'es' ? 'Referencias para identificar:' : 'Identification References:'}</h4><ul>`;
+                destino.referencias.forEach(ref => {
+                    html += `<li>${ref}</li>`;
+                });
+                html += `</ul>`;
+            }
+
+            html += `</div>`;
+            contenido.innerHTML = html;
+        }
+
+        // --- ALMACENAMIENTO OFFLINE PARA DATOS ---
+        function setupOfflineStorage() {
+            // Guardar datos importantes en localStorage para acceso offline
+            if (!localStorage.getItem('talpaData')) {
+                const offlineData = {
+                    productos: productData,
+                    hoteles: hotelData,
+                    guias: guiasDestinos,
+                    ultimaActualizacion: new Date().toISOString()
+                };
+                localStorage.setItem('talpaData', JSON.stringify(offlineData));
+            }
+        }
+
+        // --- Función para traducir la interfaz ---
+        function translateUI(lang) {
+            const translations = translationData[lang];
+
+            // Función auxiliar para actualizar texto
+            const updateText = (id, text) => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = text;
+            };
+
+            // 1. Títulos de Pantalla (Header)
+            const currentScreenId = historyStack[historyStack.length - 1];
+            document.getElementById('header-title').textContent = screens[currentScreenId][`title_${lang}`];
+
+            // 2. Dashboard
+            updateText('welcome-title', translations['welcome-title']);
+            updateText('slogan', translations['slogan']);
+            updateText('current-language', translations['current-language']);
+            document.getElementById('btn-products').innerHTML = `<i class="fas fa-shopping-basket"></i> ${translations['btn-products']}`;
+            document.getElementById('btn-hotels').innerHTML = `<i class="fas fa-hotel"></i> ${translations['btn-hotels']}`;
+            document.getElementById('dashboard-image').src = WELCOME_IMG; // Asegurar la imagen actualizada
+
+            // 3. Navegación Inferior
+            updateText('nav-home-text', translations['nav-home-text']);
+            updateText('nav-products-text', translations['nav-products-text']);
+            updateText('nav-hotels-text', translations['nav-hotels-text']);
+            updateText('nav-guide-text', translations['nav-guide-text']);
+
+            // 4. Catálogo de Romerías
+            updateText('catalogo-title', translations['catalogo-title']);
+            updateText('romeria-milagro-desc', translations['romeria-milagro-desc']);
+            updateText('romeria-sanchez-desc', translations['romeria-sanchez-desc']);
+            document.querySelectorAll('.romeria-card .location-btn .location-text').forEach(el => el.textContent = translations['location-text']);
+
+            // 5. Productos por Romería
+            updateText('category-rollos', translations['category-rollos']);
+            updateText('category-licores', translations['category-licores']);
+            updateText('category-especialidades', translations['category-especialidades']);
+            updateText('h4-rollo-tradicional', translations['h4-rollo-tradicional']);
+            updateText('p-rollo-tradicional', translations['p-rollo-tradicional']);
+            updateText('h4-rollo-leche', translations['h4-rollo-leche']);
+            updateText('p-rollo-leche', translations['p-rollo-leche']);
+            updateText('h4-rollo-cajeta', translations['h4-rollo-cajeta']);
+            updateText('p-rollo-cajeta', translations['p-rollo-cajeta']);
+            updateText('h4-rollo-pina', translations['h4-rollo-pina']);
+            updateText('p-rollo-pina', translations['p-rollo-pina']);
+            updateText('h4-rompope', translations['h4-rompope']);
+            updateText('p-rompope', translations['p-rompope']);
+            updateText('h4-cocadas', translations['h4-cocadas']);
+            updateText('p-cocadas', translations['p-cocadas']);
+            updateText('h4-ate-membrillo', translations['h4-ate-membrillo']);
+            updateText('p-ate-membrillo', translations['p-ate-membrillo']);
+            updateText('h4-dulce-tejocote', translations['h4-dulce-tejocote']);
+            updateText('p-dulce-tejocote', translations['p-dulce-tejocote']);
+            updateText('h4-cajeta-artesanal', translations['h4-cajeta-artesanal']);
+            updateText('p-cajeta-artesanal', translations['p-cajeta-artesanal']);
+            updateText('h4-mermelada-guayaba', translations['h4-mermelada-guayaba']);
+            updateText('p-mermelada-guayaba', translations['p-mermelada-guayaba']);
+            
+            // Si estamos en la vista de productos, recargarla para actualizar precios y títulos específicos
+            if (currentScreenId === 'romeria-products-view') {
+                showRomeriasProducts(currentRomeriId);
+            }
+
+            // 6. Detalle del Producto (General)
+            updateText('label-size', translations['label-size']);
+            updateText('label-quantity', translations['label-quantity']);
+            document.getElementById('btn-add-to-cart').innerHTML = `<i class="fas fa-cart-plus"></i> ${translations['btn-add-to-cart']}`;
+            // El contenido de las opciones de size se recalcula en updateProductPrice/showProductDetail
+
+            // Si estamos en la vista de detalle de producto, recargarla para actualizar el precio
+            if (currentScreenId === 'producto-detalle') {
+                const productElement = document.getElementById('product-detail-name');
+                const productName = productElement ? productElement.textContent : '';
+                let productId = null;
+                if (productName.includes('Rollo de Guayaba') || productName.includes('Traditional Guava Roll')) productId = 'rollo-tradicional';
+                if (productName.includes('Rollo Relleno de Leche Quemada') || productName.includes('Burnt Milk Filled Roll')) productId = 'rollo-leche';
+                if (productName.includes('Ate de Membrillo') || productName.includes('Quince Paste')) productId = 'ate-membrillo';
+                if (productId) showProductDetail(productId);
+            }
+
+
+            // 7. Carrito
+            updateText('carrito-title', translations['carrito-title']);
+            updateText('carrito-delivery-mode', translations['carrito-delivery-mode']);
+            document.getElementById('radio-pickup').lastChild.textContent = ` ${translations['radio-pickup']} (Rollería El Milagro)`;
+            updateText('label-delivery', translations['label-delivery']);
+            document.getElementById('carrito-final-total').innerHTML = `${translations['carrito-final-total']} ${document.getElementById('carrito-final-total').textContent.match(/\$(\d+)/)[0]} MXN`;
+            updateText('btn-checkout', translations['btn-checkout']);
+
+            // 8. Confirmación de Compra
+            updateText('confirmation-purchase-title', translations['confirmation-purchase-title']);
+            updateText('confirmation-purchase-msg', translations['confirmation-purchase-msg']);
+            updateText('confirmation-purchase-code', translations['confirmation-purchase-code']);
+
+            // 9. Búsqueda de Hoteles
+            updateText('search-hotels-title', translations['search-hotels-title']);
+            document.getElementById('input-adults').placeholder = translations['input-adults'];
+            document.getElementById('select-location').options[0].textContent = translations['select-location-santuario'];
+            document.getElementById('select-location').options[1].textContent = translations['select-location-centro'];
+            document.getElementById('select-location').options[2].textContent = translations['select-location-economico'];
+            updateText('btn-search-hotels', translations['btn-search-hotels']);
+
+            // 10. Resultados de Hoteles
+            updateText('results-title', translations['results-title']);
+            // Actualizar textos de precios y descripciones en tarjetas de resultados de hoteles (ejemplo para Diamante y Parroquia)
+            document.getElementById('diamante-price-text').textContent = document.getElementById('diamante-price-text').textContent.replace(/\/ Noche|\/ Night/g, translations['hotel-price-suffix']);
+            let parroquiaText = document.getElementById('parroquia-price-text').textContent;
+            parroquiaText = parroquiaText.replace(/\/ Noche|\/ Night/g, translations['hotel-price-suffix']);
+            parroquiaText = parroquiaText.replace(/\(Opción Económica\)|\(Budget Option\)/g, `(${translations['hotel-price-economica']})`);
+            document.getElementById('parroquia-price-text').textContent = parroquiaText;
+            document.getElementById('providencia-price-text').textContent = document.getElementById('providencia-price-text').textContent.replace(/\/ Noche|\/ Night/g, translations['hotel-price-suffix']);
+            
+            // 11. Detalle del Hotel
+            updateText('hotel-detail-desc', translations['hotel-detail-desc']);
+            updateText('hotel-detail-rooms-title', translations['hotel-detail-rooms-title']);
+            // Las habitaciones se recargan en showHotelDetails, así que si estamos en detalle, recargar
+            if (currentScreenId === 'hotel-detalle') {
+                const hotelName = document.getElementById('hotel-detail-name-title').textContent;
+                const hotelId = hotelName.includes('Diamante') ? 'diamante' : hotelName.includes('Parroquia') ? 'parroquia' : 'providencia';
+                showHotelDetails(hotelId);
+            }
+
+            // 12. Reserva Huésped
+            updateText('guest-reserve-title', translations['guest-reserve-title']);
+            updateText('guest-data-title', translations['guest-data-title']);
+            document.getElementById('input-full-name').placeholder = translations['input-full-name'];
+            document.getElementById('input-email').placeholder = translations['input-email'];
+            document.getElementById('input-phone').placeholder = translations['input-phone'];
+            updateText('online-payment-title', translations['online-payment-title']);
+            updateText('advance-payment-info', translations['advance-payment-info']);
+            updateText('btn-pay-advance', translations['btn-pay-advance']);
+
+            // 13. Guía Offline
+            updateText('offline-guide-title', translations['offline-guide-title']);
+            updateText('offline-guide-info', translations['offline-guide-info']);
+            updateText('opt-select-dest', translations['opt-select-dest']);
+            document.getElementById('offline-destination-select').options[0].textContent = translations['opt-select-dest'];
+
+            // 14. Botón de Ubicación en Productos
+            const romeriaLocationBtn = document.getElementById('romeria-location-btn');
+            if (romeriaLocationBtn) {
+                 romeriaLocationBtn.querySelector('.location-text').textContent = translations['romeria-location-text'];
+            }
+
+            // Recargar guía offline si está visible
+            if (currentScreenId === 'guia-offline') {
+                showOfflineDirections(document.getElementById('offline-destination-select').value);
+            }
+        }
+
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar la aplicación en el Dashboard
+            showScreen('dashboard');
+            setupOfflineStorage();
+            updateOnlineStatus();
+            
+            // Precargar guías
+            showRomeriasProducts('el-milagro');
+            historyStack = ['dashboard']; 
+            document.getElementById('romeria-products-view').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('header-title').textContent = screens['dashboard'][`title_${currentLang}`];
+        });
+    </script>
+</body>
+</html>
